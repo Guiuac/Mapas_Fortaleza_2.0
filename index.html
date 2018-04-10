@@ -42,7 +42,7 @@ body{
 <div class="container">
 
 	<div class="options-box">
-		<h1>Fortaleza em Mapas 2.0: </h1>
+		<h1>Fortaleza em Mapas: </h1>
 		<div>
 			<input id="show-listings" type="button" value="Mostrar Listas">
 			<input id="hide-listings" type="button" value="Esconder Listas">
@@ -63,27 +63,243 @@ body{
 //Função para carregar o mapa
 	function initMap(){
 
+
+		var styles = [
+  {
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#ebe3cd"
+      }
+    ]
+  },
+  {
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#523735"
+      }
+    ]
+  },
+  {
+    "elementType": "labels.text.stroke",
+    "stylers": [
+      {
+        "color": "#f5f1e6"
+      }
+    ]
+  },
+  {
+    "featureType": "administrative",
+    "elementType": "geometry.stroke",
+    "stylers": [
+      {
+        "color": "#c9b2a6"
+      }
+    ]
+  },
+  {
+    "featureType": "administrative.land_parcel",
+    "elementType": "geometry.stroke",
+    "stylers": [
+      {
+        "color": "#dcd2be"
+      }
+    ]
+  },
+  {
+    "featureType": "administrative.land_parcel",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#ae9e90"
+      }
+    ]
+  },
+  {
+    "featureType": "landscape.natural",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#dfd2ae"
+      }
+    ]
+  },
+  {
+    "featureType": "poi",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#dfd2ae"
+      }
+    ]
+  },
+  {
+    "featureType": "poi",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#93817c"
+      }
+    ]
+  },
+  {
+    "featureType": "poi.park",
+    "elementType": "geometry.fill",
+    "stylers": [
+      {
+        "color": "#a5b076"
+      }
+    ]
+  },
+  {
+    "featureType": "poi.park",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#447530"
+      }
+    ]
+  },
+  {
+    "featureType": "road",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#f5f1e6"
+      }
+    ]
+  },
+  {
+    "featureType": "road.arterial",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#fdfcf8"
+      }
+    ]
+  },
+  {
+    "featureType": "road.highway",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#f8c967"
+      }
+    ]
+  },
+  {
+    "featureType": "road.highway",
+    "elementType": "geometry.stroke",
+    "stylers": [
+      {
+        "color": "#e9bc62"
+      }
+    ]
+  },
+  {
+    "featureType": "road.highway.controlled_access",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#e98d58"
+      }
+    ]
+  },
+  {
+    "featureType": "road.highway.controlled_access",
+    "elementType": "geometry.stroke",
+    "stylers": [
+      {
+        "color": "#db8555"
+      }
+    ]
+  },
+  {
+    "featureType": "road.local",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#806b63"
+      }
+    ]
+  },
+  {
+    "featureType": "transit.line",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#dfd2ae"
+      }
+    ]
+  },
+  {
+    "featureType": "transit.line",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#8f7d77"
+      }
+    ]
+  },
+  {
+    "featureType": "transit.line",
+    "elementType": "labels.text.stroke",
+    "stylers": [
+      {
+        "color": "#ebe3cd"
+      }
+    ]
+  },
+  {
+    "featureType": "transit.station",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#dfd2ae"
+      }
+    ]
+  },
+  {
+    "featureType": "water",
+    "elementType": "geometry.fill",
+    "stylers": [
+      {
+        "color": "#b9d3c2"
+      }
+    ]
+  },
+  {
+    "featureType": "water",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#92998d"
+      }
+    ]
+  }
+]
+
 		map = new google.maps.Map(document.getElementById('map'),{
-			center: {lat: -3.7943731426509637, lng: -38.452491760253906},
-			zoom: 12
+			center: {lat: -3.7943731426509637, lng: -38.4524917602},
+			zoom: 12,
+			styles: styles,
+			mapTypeControl: false
 		});
 		
 // Array que receberá as posições para compor os marcadores
-	var locations = [{title: 'Rua Paurilo Barroso, 235', location: {lat:-3.800609, lng: -38.569449}},
-	{title: 'Carrefour, Godofredo Maciel', location: {lat:-3.803546, lng: -38.573934}},
-	{title: 'Habibs', location: {lat:-3.803776, lng: -38.571917}},
-	{title: 'Rua Paurilo Barroso, 235', location: {lat:-3.800887, lng: -38.571802}}
+	var locations = [{title: 'AUGUSTO', location: {lat:-3.800609, lng: -38.569449}},
+	{title: 'JANDERSON - Mouth Machine', location: {lat:-3.798177, lng: -38.577365}},
+	{title: 'FANOR', location: {lat:-3.749484, lng: -38.462489}},
+	{title: 'UNIFOR', location: {lat:-3.744798, lng: -38.572782}}
 	];
 
-	
-	var largeInfoWindow = new google.maps.InfoWindow();
-	var bounds = new google.maps.LatLngBounds();
+var largeInfoWindow = new google.maps.InfoWindow();
 
 	for (var i = 0; i < locations.length; i++) {
 		
 		var position = locations[i].location;
 		var title = locations[i].title;
-
 		var marker = new google.maps.Marker({
 			map: map,
 			position: position,
@@ -91,16 +307,16 @@ body{
 			animation: google.maps.Animation.DROP,
 			id: i
 		});
-
 		markers.push(marker);
 		
-		bounds.extend(marker.position);
-
+		
 		marker.addListener('click', function(){
 			populateInfoWindow(this, largeInfoWindow);
 		});
 	}
 
+
+		
 function populateInfoWindow(marker, infowindow)	{
 
 if(infowindow.marker != marker){
@@ -115,14 +331,23 @@ if(infowindow.marker != marker){
 }
 
 function showListings(){
+	var bounds = new google.maps.LatLngBounds();
+	for (var i = 0; i < markers.length; i++) {
+		markers[i].setMap(map);
+		bounds.extend(markers[i].position);
+		
+	}
 
-	
-
-
+	map.fitBounds(bounds);
 }
 
+function hideListings(){
 
-map.fitBounds(bounds);
+	for (var i = 0; i < markers.length;i++ ){
+		markers[i].setMap(null);
+	}
+}
+
 
 document.getElementById('show-listings').addEventListener('click', showListings);
 document.getElementById('hide-listings').addEventListener('click', hideListings);
