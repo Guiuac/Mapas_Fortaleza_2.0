@@ -280,11 +280,11 @@ body{
   }
 ]
 
-		map = new google.maps.Map(document.getElementById('map'),{
-			center: {lat: -3.7943731426509637, lng: -38.4524917602},
-			zoom: 12,
-			styles: styles,
-			mapTypeControl: false
+	map = new google.maps.Map(document.getElementById('map'),{
+		center: {lat: -3.7943731426509637, lng: -38.4524917602},
+		zoom: 12,
+		styles: styles,
+		mapTypeControl: false
 		});
 		
 // Array que receberá as posições para compor os marcadores
@@ -294,7 +294,11 @@ body{
 	{title: 'UNIFOR', location: {lat:-3.744798, lng: -38.572782}}
 	];
 
-var largeInfoWindow = new google.maps.InfoWindow();
+	var largeInfoWindow = new google.maps.InfoWindow();
+
+	var defaultIcon = makeMarkerIcon('0091ff');
+	var highlightedIcon = makeMarkerIcon('FFFF24');
+
 
 	for (var i = 0; i < locations.length; i++) {
 		
@@ -304,6 +308,7 @@ var largeInfoWindow = new google.maps.InfoWindow();
 			map: map,
 			position: position,
 			title: title,
+			icon: defaultIcon,
 			animation: google.maps.Animation.DROP,
 			id: i
 		});
@@ -313,13 +318,20 @@ var largeInfoWindow = new google.maps.InfoWindow();
 		marker.addListener('click', function(){
 			populateInfoWindow(this, largeInfoWindow);
 		});
+
+		marker.addListener('mouseover',function(){
+			this.setIcon(highlightedIcon);
+		});
+		marker.addListener('mouseout', function(){
+			this.setIcon(defaultIcon);
+		});
+
 	}
 
-
 		
-function populateInfoWindow(marker, infowindow)	{
+	function populateInfoWindow(marker, infowindow)	{
 
-if(infowindow.marker != marker){
+	if(infowindow.marker != marker){
 
 	infowindow.marker = marker;
 	infowindow.setContent('<div>'+ marker.title +'</div>');
@@ -330,7 +342,7 @@ if(infowindow.marker != marker){
 }
 }
 
-function showListings(){
+	function showListings(){
 	var bounds = new google.maps.LatLngBounds();
 	for (var i = 0; i < markers.length; i++) {
 		markers[i].setMap(map);
@@ -341,18 +353,34 @@ function showListings(){
 	map.fitBounds(bounds);
 }
 
-function hideListings(){
+	function hideListings(){
 
 	for (var i = 0; i < markers.length;i++ ){
 		markers[i].setMap(null);
 	}
 }
 
+	document.getElementById('show-listings').addEventListener('click', showListings);
+	document.getElementById('hide-listings').addEventListener('click', hideListings);
 
-document.getElementById('show-listings').addEventListener('click', showListings);
-document.getElementById('hide-listings').addEventListener('click', hideListings);
 
 }
+
+	function makeMarkerIcon(markerColor){
+		var markerImage = new google.maps.MarkerImage(
+			'http://chart.googleapis.com/chart?chst=d_map_spin&chld=1.1|0|' + markerColor +
+			'|50|_|%E2%80%A2',
+			new google.maps.Size(26,39),
+			new google.maps.Point(0,0),
+			new google.maps.Point(15,39),
+			new google.maps.Size(26,39));
+			
+			return markerImage;
+}
+
+
+
+
 </script>
 
 <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAX5rTVmZw4bJzlz6eQYwRbUPN6zDwkH_I&V=3&callback=initMap"> </script>
