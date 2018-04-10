@@ -4,7 +4,7 @@
 <head>
 	
 <style>
-
+/*     */
 html,
 body{
 
@@ -14,46 +14,121 @@ body{
   padding: 0;
 }
 #map {
+  bottom: 0px;
   height: 100%;
+  left: 362px;
+  position: absolute;
+  right: 0px;
+
 }
+
+.options-box {
+	background: fff;
+	border: 1px solid #999;
+	border-radius: 3px;
+	height: 100%;
+	line-height: 35px;
+	padding: 10px 10px 30px 10px;
+	text-align: left;
+	width: 340px;
+}
+
 </style>
 
 </head>
 
 <body>
+
+<div class="container">
+
+	<div class="options-box">
+		<h1>Fortaleza em Mapas 2.0: </h1>
+		<div>
+			<input id="show-listings" type="button" value="Mostrar Listas">
+			<input id="hide-listings" type="button" value="Esconder Listas">
+		</div>
+	</div>
+
+</div>
+
+
 <div id="map"></div>
 
 <script>
-	
+
+//Variavel que recebe o mapa e array que receberá os marcadores
 	var map;
+	var markers = [];
+
+//Função para carregar o mapa
 	function initMap(){
 
 		map = new google.maps.Map(document.getElementById('map'),{
 			center: {lat: -3.7943731426509637, lng: -38.452491760253906},
 			zoom: 12
 		});
+		
+// Array que receberá as posições para compor os marcadores
+	var locations = [{title: 'Rua Paurilo Barroso, 235', location: {lat:-3.800609, lng: -38.569449}},
+	{title: 'Carrefour, Godofredo Maciel', location: {lat:-3.803546, lng: -38.573934}},
+	{title: 'Habibs', location: {lat:-3.803776, lng: -38.571917}},
+	{title: 'Rua Paurilo Barroso, 235', location: {lat:-3.800887, lng: -38.571802}}
+	];
 
-	var redencao ={lat:-3.800609, lng: -38.569449};
 	
-	var marker = new google.maps.Marker({
-		position: redencao,
-		map : map,
-		title: 'First Marker!'
-	});
+	var largeInfoWindow = new google.maps.InfoWindow();
+	var bounds = new google.maps.LatLngBounds();
 
-	var infowindow = new google.maps.InfoWindow({
-		content: 'Casa do Augusto: ' + 'Maraponga, Fortaleza - CE'
+	for (var i = 0; i < locations.length; i++) {
+		
+		var position = locations[i].location;
+		var title = locations[i].title;
 
-	});
+		var marker = new google.maps.Marker({
+			map: map,
+			position: position,
+			title: title,
+			animation: google.maps.Animation.DROP,
+			id: i
+		});
 
-	marker.addListener('click', function(){
-		infowindow.open(map,marker);
-	});
+		markers.push(marker);
+		
+		bounds.extend(marker.position);
 
+		marker.addListener('click', function(){
+			populateInfoWindow(this, largeInfoWindow);
+		});
 	}
 
-</script>
+function populateInfoWindow(marker, infowindow)	{
 
+if(infowindow.marker != marker){
+
+	infowindow.marker = marker;
+	infowindow.setContent('<div>'+ marker.title +'</div>');
+	infowindow.open(map, marker);
+	infowindow.addListener('closeclick', function(){
+	infowindow.setMarker(null);
+	});
+}
+}
+
+function showListings(){
+
+	
+
+
+}
+
+
+map.fitBounds(bounds);
+
+document.getElementById('show-listings').addEventListener('click', showListings);
+document.getElementById('hide-listings').addEventListener('click', hideListings);
+
+}
+</script>
 
 <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAX5rTVmZw4bJzlz6eQYwRbUPN6zDwkH_I&V=3&callback=initMap"> </script>
 
