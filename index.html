@@ -52,6 +52,9 @@
       <div>
         <input id="show-listings" type="button" value="Mostrar Listas">
         <input id="hide-listings" type="button" value="Esconder Listas">
+        <hr>
+        <span class="text">Desenhe sua forma aqui</span>
+        <input id="toggle-drawing" type="button" value="Ferramenta de Desenho">
       </div>
     </div>
 
@@ -297,12 +300,26 @@
 
       // Array que receberá as posições para compor os marcadores
       var locations = [{ title: 'AUGUSTO', location: { lat: -3.800609, lng: -38.569449 } },
-      { title: 'JANDERSON - Mouth Machine', location: { lat: -3.798177, lng: -38.577365 } },
+      { title: 'TOCA DO FRANGO', location: { lat: -3.798177, lng: -38.577365 } },
       { title: 'FANOR', location: { lat: -3.749484, lng: -38.462489 } },
       { title: 'UNIFOR', location: { lat: -3.744798, lng: -38.572782 } }
       ];
 
       var largeInfoWindow = new google.maps.InfoWindow();
+
+      var drawingManager = new google.maps.drawing.drawingManager({
+        drawingMode: google.maps.drawing.OverlayType.POLYGON,
+        drawingControl: true,
+        drawingControlOptions: {
+          position: google.maps.ControlPosition.TOP_LEFT,
+          drawingModes: [
+            google.maps.drawing.OverlayType.POLYGON
+          ]
+        }
+      });
+
+
+
       //Define as propriedades do icone
       var defaultIcon = makeMarkerIcon('0091ff');
       var highlightedIcon = makeMarkerIcon('FFFF24');
@@ -400,6 +417,9 @@
     document.getElementById('show-listings').addEventListener('click', showListings);
     document.getElementById('hide-listings').addEventListener('click', hideListings);
 
+    document.getElementById('toggle-drawing').addEventListener('click', function () {
+      toggleDrawing(drawingManager);
+    });
 
 
 
@@ -415,6 +435,13 @@
       return markerImage;
     }
 
+    function toggleDrawing(drawingManager) {
+      if (drawingManager.map) {
+        drawingManager.setMap(null);
+      } else {
+        drawingManager.setMap(map);
+      }
+    }
 
 
 
