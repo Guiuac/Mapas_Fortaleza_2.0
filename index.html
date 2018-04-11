@@ -24,6 +24,11 @@
 
     }
 
+    #pano {
+      width: 200px;
+      height: 200px;
+    }
+
     .options-box {
       background: #fff;
       border: 1px solid #999;
@@ -331,59 +336,81 @@
 
       }
 
-
       function populateInfoWindow(marker, infowindow) {
 
         if (infowindow.marker != marker) {
 
           infowindow.marker = marker;
-          infowindow.setContent('<div>' + marker.title + '</div>');
+          infowindow.setContent('');
           infowindow.open(map, marker);
           infowindow.addListener('closeclick', function () {
             infowindow.setMarker(null);
           });
-          
-          var streetViewService = new google.maps.streetViewService();
+
+          var streetViewService = new google.maps.StreetViewService();
           var radius = 50;
 
-          
+          function getStreetView(data, status) {
+            if (status == google.maps.StreetViewStatus.OK) {
+              var nearStreetViewLocation = data.location.latLng;
+              var heading = google.maps.geometry.spherical.computeHeading(
+                nearStreetViewLocation, marker.position);
+              infowindow.setContent('<div>' + marker.title + '</div>' + '<div id="pano"></div>');
+              var panoramaOptions = {
+                position: nearStreetViewLocation,
+                pov: {
+                  heading: heading,
+                  pitch: 30
+                }
+              };
+              var panorama = new google.maps.StreetViewPanorama(
+                document.getElementById('pano'), panoramaOptions);
+            } else {
+              infowindow.setContent('<div>' + marker.title + '</div>' + '<div>No Street View Found</div>');
+            }
 
+          }
+          streetViewService.getPanoramaByLocation(marker.position, radius, getStreetView);
+          infowindow.open(map, marker);
 
         }
+
+
       }
-
-      function showListings() {
-        var bounds = new google.maps.LatLngBounds();
-        for (var i = 0; i < markers.length; i++) {
-          markers[i].setMap(map);
-          bounds.extend(markers[i].position);
-
-        }
-
-        map.fitBounds(bounds);
-      }
-
-      function hideListings() {
-
-        for (var i = 0; i < markers.length; i++) {
-          markers[i].setMap(null);
-        }
-      }
-
-      document.getElementById('show-listings').addEventListener('click', showListings);
-      document.getElementById('hide-listings').addEventListener('click', hideListings);
-
-
     }
+
+    function showListings() {
+      var bounds = new google.maps.LatLngBounds();
+      for (var i = 0; i < markers.length; i++) {
+        markers[i].setMap(map);
+        bounds.extend(markers[i].position);
+
+      }
+
+      map.fitBounds(bounds);
+    }
+
+    function hideListings() {
+
+      for (var i = 0; i < markers.length; i++) {
+        markers[i].setMap(null);
+      }
+    }
+
+    document.getElementById('show-listings').addEventListener('click', showListings);
+    document.getElementById('hide-listings').addEventListener('click', hideListings);
+
+
+
 
     function makeMarkerIcon(markerColor) {
       var markerImage = new google.maps.MarkerImage(
-        'http://chart.googleapis.com/chart?chst=d_map_spin&chld=1.1|0|' + markerColor +
-        '|50|_|%E2%80%A2',
-        new google.maps.Size(26, 39),
+        'http://chart.googleapis.com/chart?chst=d_map_spin&chld=1.15|0|' + markerColor +
+        '|40|_|%E2%80%A2',
+        new google.maps.Size(21, 34),
         new google.maps.Point(0, 0),
-        new google.maps.Point(15, 39),
-        new google.maps.Size(26, 39));
+        new google.maps.Point(10, 34),
+        new google.maps.Size(21, 34));
 
       return markerImage;
     }
@@ -393,7 +420,7 @@
 
   </script>
 
-  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAX5rTVmZw4bJzlz6eQYwRbUPN6zDwkH_I&V=3&callback=initMap"> </script>
+  <script async defer src="https://maps.googleapis.com/maps/api/js?libraries=places,geometry,drawing&key=AIzaSyCtU2Job9s16ReKHFqKAK_uM70CueOgqqI&V=3&callback=initMap"> </script>
 
 </body>
 
