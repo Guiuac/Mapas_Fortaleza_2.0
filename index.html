@@ -15,6 +15,25 @@
       padding: 0;
     }
 
+    h1 {
+      color: #525454;
+      font-size: 22px;
+      margin: 0 0 10px 0;
+      text-align: center;
+    }
+
+    #hide-listings,
+    #show-listings {
+      width: 48%;
+    }
+
+    hr {
+      background: #D0D7D9;
+      height: 1px;
+      margin: 20px 0 20px 0;
+      border: none;
+    }
+
     #map {
       bottom: 0px;
       height: 100%;
@@ -39,6 +58,29 @@
       text-align: left;
       width: 340px;
     }
+
+    #places-search,
+    #search-within-time-text {
+      width: 84%;
+    }
+
+    .text {
+      font-size: 12px;
+    }
+
+    #toggle-drawing {
+
+      position: relative;
+      margin-left: 10px;
+    }
+
+    #zoom-to-area-text {
+      width: 70%;
+    }
+
+    #zoom-to-area {
+      width: 24%;
+    }
   </style>
 
 </head>
@@ -57,7 +99,7 @@
         <input id="toggle-drawing" type="button" value="Ferramenta de Desenho">
       </div>
     </div>
-
+    <hr>
   </div>
 
 
@@ -68,6 +110,7 @@
     //Variavel que recebe o mapa e array que receberá os marcadores
     var map;
     var markers = [];
+    var polygon = null;
 
     //Função para carregar o mapa
     function initMap() {
@@ -75,125 +118,149 @@
 
       var styles = [
         {
+          "featureType": "administrative",
           "elementType": "geometry",
           "stylers": [
             {
-              "color": "#ebe3cd"
+              "visibility": "off"
             }
           ]
         },
         {
+          "featureType": "administrative.land_parcel",
+          "elementType": "labels",
+          "stylers": [
+            {
+              "visibility": "off"
+            }
+          ]
+        },
+        {
+          "featureType": "administrative.locality",
+          "stylers": [
+            {
+              "weight": 3.5
+            }
+          ]
+        },
+        {
+          "featureType": "administrative.locality",
           "elementType": "labels.text.fill",
           "stylers": [
             {
-              "color": "#523735"
+              "color": "#1aa195"
+            },
+            {
+              "lightness": -40
             }
           ]
         },
         {
+          "featureType": "administrative.locality",
           "elementType": "labels.text.stroke",
           "stylers": [
             {
-              "color": "#f5f1e6"
+              "weight": 5
             }
           ]
         },
         {
-          "featureType": "administrative",
+          "featureType": "landscape.man_made",
+          "elementType": "geometry.fill",
+          "stylers": [
+            {
+              "color": "#e3e7ea"
+            }
+          ]
+        },
+        {
+          "featureType": "landscape.man_made",
           "elementType": "geometry.stroke",
           "stylers": [
             {
-              "color": "#c9b2a6"
-            }
-          ]
-        },
-        {
-          "featureType": "administrative.land_parcel",
-          "elementType": "geometry.stroke",
-          "stylers": [
-            {
-              "color": "#dcd2be"
-            }
-          ]
-        },
-        {
-          "featureType": "administrative.land_parcel",
-          "elementType": "labels.text.fill",
-          "stylers": [
-            {
-              "color": "#ae9e90"
+              "visibility": "off"
             }
           ]
         },
         {
           "featureType": "landscape.natural",
-          "elementType": "geometry",
           "stylers": [
             {
-              "color": "#dfd2ae"
+              "saturation": -25
             }
           ]
         },
         {
-          "featureType": "poi",
-          "elementType": "geometry",
-          "stylers": [
-            {
-              "color": "#dfd2ae"
-            }
-          ]
-        },
-        {
-          "featureType": "poi",
-          "elementType": "labels.text.fill",
-          "stylers": [
-            {
-              "color": "#93817c"
-            }
-          ]
-        },
-        {
-          "featureType": "poi.park",
+          "featureType": "landscape.natural",
           "elementType": "geometry.fill",
           "stylers": [
             {
-              "color": "#a5b076"
+              "color": "#e1ece1"
             }
           ]
         },
         {
-          "featureType": "poi.park",
-          "elementType": "labels.text.fill",
+          "featureType": "landscape.natural.landcover",
+          "elementType": "geometry.fill",
           "stylers": [
             {
-              "color": "#447530"
+              "visibility": "on"
+            }
+          ]
+        },
+        {
+          "featureType": "landscape.natural.terrain",
+          "elementType": "geometry.fill",
+          "stylers": [
+            {
+              "color": "#9cdcfe"
+            },
+            {
+              "visibility": "on"
+            }
+          ]
+        },
+        {
+          "featureType": "poi",
+          "stylers": [
+            {
+              "visibility": "off"
             }
           ]
         },
         {
           "featureType": "road",
-          "elementType": "geometry",
+          "elementType": "labels.icon",
           "stylers": [
             {
-              "color": "#f5f1e6"
+              "visibility": "off"
             }
           ]
         },
         {
           "featureType": "road.arterial",
-          "elementType": "geometry",
+          "elementType": "labels.text.fill",
           "stylers": [
             {
-              "color": "#fdfcf8"
+              "color": "#617876"
+            }
+          ]
+        },
+        {
+          "featureType": "road.arterial",
+          "elementType": "labels.text.stroke",
+          "stylers": [
+            {
+              "color": "#ffffff"
             }
           ]
         },
         {
           "featureType": "road.highway",
-          "elementType": "geometry",
+          "elementType": "geometry.fill",
           "stylers": [
             {
-              "color": "#f8c967"
+              "color": "#fbfcda"
             }
           ]
         },
@@ -202,25 +269,85 @@
           "elementType": "geometry.stroke",
           "stylers": [
             {
-              "color": "#e9bc62"
+              "color": "#f5daa0"
             }
           ]
         },
         {
-          "featureType": "road.highway.controlled_access",
+          "featureType": "road.highway",
+          "elementType": "labels",
+          "stylers": [
+            {
+              "saturation": 25
+            }
+          ]
+        },
+        {
+          "featureType": "road.highway",
+          "elementType": "labels.icon",
+          "stylers": [
+            {
+              "saturation": -100
+            },
+            {
+              "visibility": "simplified"
+            }
+          ]
+        },
+        {
+          "featureType": "road.highway",
+          "elementType": "labels.text.fill",
+          "stylers": [
+            {
+              "saturation": -100
+            },
+            {
+              "visibility": "simplified"
+            },
+            {
+              "weight": 3
+            }
+          ]
+        },
+        {
+          "featureType": "road.local",
           "elementType": "geometry",
           "stylers": [
             {
-              "color": "#e98d58"
+              "visibility": "simplified"
             }
           ]
         },
         {
-          "featureType": "road.highway.controlled_access",
-          "elementType": "geometry.stroke",
+          "featureType": "road.local",
+          "elementType": "geometry.fill",
           "stylers": [
             {
-              "color": "#db8555"
+              "color": "#f3f5f5"
+            },
+            {
+              "visibility": "simplified"
+            }
+          ]
+        },
+        {
+          "featureType": "road.local",
+          "elementType": "labels",
+          "stylers": [
+            {
+              "visibility": "off"
+            }
+          ]
+        },
+        {
+          "featureType": "road.local",
+          "elementType": "labels.text",
+          "stylers": [
+            {
+              "color": "#99afb5"
+            },
+            {
+              "visibility": "simplified"
             }
           ]
         },
@@ -229,43 +356,24 @@
           "elementType": "labels.text.fill",
           "stylers": [
             {
-              "color": "#806b63"
+              "color": "#799391"
             }
           ]
         },
         {
-          "featureType": "transit.line",
-          "elementType": "geometry",
-          "stylers": [
-            {
-              "color": "#dfd2ae"
-            }
-          ]
-        },
-        {
-          "featureType": "transit.line",
-          "elementType": "labels.text.fill",
-          "stylers": [
-            {
-              "color": "#8f7d77"
-            }
-          ]
-        },
-        {
-          "featureType": "transit.line",
+          "featureType": "road.local",
           "elementType": "labels.text.stroke",
           "stylers": [
             {
-              "color": "#ebe3cd"
+              "color": "#75918e"
             }
           ]
         },
         {
-          "featureType": "transit.station",
-          "elementType": "geometry",
+          "featureType": "transit",
           "stylers": [
             {
-              "color": "#dfd2ae"
+              "visibility": "off"
             }
           ]
         },
@@ -274,16 +382,7 @@
           "elementType": "geometry.fill",
           "stylers": [
             {
-              "color": "#b9d3c2"
-            }
-          ]
-        },
-        {
-          "featureType": "water",
-          "elementType": "labels.text.fill",
-          "stylers": [
-            {
-              "color": "#92998d"
+              "color": "#9cdcfe"
             }
           ]
         }
@@ -307,7 +406,7 @@
 
       var largeInfoWindow = new google.maps.InfoWindow();
 
-      var drawingManager = new google.maps.drawing.drawingManager({
+      var drawingManager = new google.maps.drawing.DrawingManager({
         drawingMode: google.maps.drawing.OverlayType.POLYGON,
         drawingControl: true,
         drawingControlOptions: {
@@ -330,7 +429,6 @@
         var position = locations[i].location;
         var title = locations[i].title;
         var marker = new google.maps.Marker({
-          map: map,
           position: position,
           title: title,
           icon: defaultIcon,
@@ -351,50 +449,80 @@
           this.setIcon(defaultIcon);
         });
 
+
+
       }
 
-      function populateInfoWindow(marker, infowindow) {
 
-        if (infowindow.marker != marker) {
+      document.getElementById('show-listings').addEventListener('click', showListings);
+      document.getElementById('hide-listings').addEventListener('click', hideListings);
 
-          infowindow.marker = marker;
-          infowindow.setContent('');
-          infowindow.open(map, marker);
-          infowindow.addListener('closeclick', function () {
-            infowindow.setMarker(null);
-          });
+      document.getElementById('toggle-drawing').addEventListener('click', function () {
+        toggleDrawing(drawingManager);
+      });
 
-          var streetViewService = new google.maps.StreetViewService();
-          var radius = 50;
 
-          function getStreetView(data, status) {
-            if (status == google.maps.StreetViewStatus.OK) {
-              var nearStreetViewLocation = data.location.latLng;
-              var heading = google.maps.geometry.spherical.computeHeading(
-                nearStreetViewLocation, marker.position);
-              infowindow.setContent('<div>' + marker.title + '</div>' + '<div id="pano"></div>');
-              var panoramaOptions = {
-                position: nearStreetViewLocation,
-                pov: {
-                  heading: heading,
-                  pitch: 30
-                }
-              };
-              var panorama = new google.maps.StreetViewPanorama(
-                document.getElementById('pano'), panoramaOptions);
-            } else {
-              infowindow.setContent('<div>' + marker.title + '</div>' + '<div>No Street View Found</div>');
-            }
-
-          }
-          streetViewService.getPanoramaByLocation(marker.position, radius, getStreetView);
-          infowindow.open(map, marker);
-
+      drawingManager.addListener('overlaycomplete', function (event) {
+        if (polygon) {
+          polygon.setMap(null);
+          hideListings();
         }
 
+        drawingManager.setDrawingMode(null);
+        polygon = event.overlay;
+        polygon.setEditable(true);
+
+        searchWithinPolygon();
+
+        polygon.getPath().addListener('set_at', searchWithinPolygon);
+        polygon.getPath().addListener('insert_at', searchWithinPolygon);
+
+      });
+
+      map.fitBounds(bounds);
+
+    }
+
+    function populateInfoWindow(marker, infowindow) {
+      if (infowindow.marker != marker) {
+        infowindow.marker = marker;
+        infowindow.setContent('');
+        infowindow.open(map, marker);
+        infowindow.addListener('closeclick', function () {
+          infowindow.setMarker(null);
+        });
+
+        var streetViewService = new google.maps.StreetViewService();
+        var radius = 50;
+
+        function getStreetView(data, status) {
+          if (status == google.maps.StreetViewStatus.OK) {
+            var nearStreetViewLocation = data.location.latLng;
+            var heading = google.maps.geometry.spherical.computeHeading(
+              nearStreetViewLocation, marker.position);
+            infowindow.setContent('<div>' + marker.title + '</div>' + '<div id="pano"></div>');
+            var panoramaOptions = {
+              position: nearStreetViewLocation,
+              pov: {
+                heading: heading,
+                pitch: 30
+              }
+            };
+            var panorama = new google.maps.StreetViewPanorama(
+              document.getElementById('pano'), panoramaOptions);
+          } else {
+            infowindow.setContent('<div>' + marker.title + '</div>' + '<div>No Street View Found</div>');
+          }
+
+        }
+        streetViewService.getPanoramaByLocation(marker.position, radius, getStreetView);
+        infowindow.open(map, marker);
 
       }
+
+
     }
+
 
     function showListings() {
       var bounds = new google.maps.LatLngBounds();
@@ -404,8 +532,9 @@
 
       }
 
-      map.fitBounds(bounds);
     }
+
+
 
     function hideListings() {
 
@@ -413,13 +542,6 @@
         markers[i].setMap(null);
       }
     }
-
-    document.getElementById('show-listings').addEventListener('click', showListings);
-    document.getElementById('hide-listings').addEventListener('click', hideListings);
-
-    document.getElementById('toggle-drawing').addEventListener('click', function () {
-      toggleDrawing(drawingManager);
-    });
 
 
 
@@ -435,19 +557,39 @@
       return markerImage;
     }
 
+
     function toggleDrawing(drawingManager) {
       if (drawingManager.map) {
         drawingManager.setMap(null);
+        if (polygon) {
+          polygon.setMap(null);
+        }
+
       } else {
         drawingManager.setMap(map);
       }
+
+    }
+
+    function searchWithinPolygon() {
+      for (var i = 0; i < markers.length; i++) {
+        if (google.maps.geometry.poly.containsLocation(markers[i].position, polygon)) {
+          markers[i].setMap(map);
+        } else {
+          markers[i].setMap(null);
+
+        }
+
+
+      }
+
     }
 
 
 
   </script>
 
-  <script async defer src="https://maps.googleapis.com/maps/api/js?libraries=places,geometry,drawing&key=AIzaSyCtU2Job9s16ReKHFqKAK_uM70CueOgqqI&V=3&callback=initMap"> </script>
+  <script async defer src="https://maps.googleapis.com/maps/api/js?libraries=drawing,geometry&key=AIzaSyCtU2Job9s16ReKHFqKAK_uM70CueOgqqI&V=3&callback=initMap"> </script>
 
 </body>
 
