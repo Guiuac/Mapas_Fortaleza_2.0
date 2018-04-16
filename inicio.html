@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+  <style>
+    /*     */
+    html,
+    body {
+      background: #1A7880;
+      font-family: Arial, sans-serif;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    h1 {
+      color: #525454;
+      font-size: 22px;
+      margin: 0 0 10px 0;
+      text-align: center;
+    }
+    #hide-listings,
+    #show-listings {
+      width: 48%;
+    }
+    hr {
+      background: #D0D7D9;
+      height: 1px;
+      margin: 20px 0 20px 0;
+      border: none;
+    }
+    #map {
+      bottom: 0px;
+      height: 100%;
+      left: 362px;
+      position: absolute;
+      right: 0px;
+    }
+    #pano {
+      width: 200px;
+      height: 200px;
+    }
+    .options-box {
+      background: #fff;
+      border: 1px solid #999;
+      border-radius: 3px;
+      height: 100%;
+      line-height: 35px;
+      padding: 10px 10px 30px 10px;
+      text-align: left;
+      width: 340px;
+    }
+    #places-search,
+    #search-within-time-text {
+      width: 84%;
+    }
+    .text {
+      font-size: 12px;
+    }
+    #toggle-drawing {
+      position: relative;
+      margin-left: 10px;
+    }
+    #zoom-to-area-text {
+      width: 70%;
+    }
+    #zoom-to-area {
+      width: 24%;
+    }
+  </style>
+
+</head>
+
+<body>
+
+  <div class="container">
+
+    <div class="options-box">
+      <h1>Fortaleza em Mapas: </h1>
+      <div>
+        <input id="show-listings" type="button" value="Mostrar Pontos">
+        <input id="hide-listings" type="button" value="Esconder Pontos">
+        <hr>
+        <span class="text">Realize sua pesquisa personalizada: </span>
+        <input id="toggle-drawing" type="button" value="Desenhar Área">
+      </div>
+    </div>
+    <hr>
+  </div>
+
+
+  <div id="map"></div>
+
+  <script>
+    //Variavel que recebe o mapa e array que receberá os marcadores
+    var map;
+    var markers = [];
+    var polygon = null;
+    //Função para carregar o mapa
+    function initMap() {
+      var styles = [
+        {
+          "featureType": "administrative",
+          "elementType": "geometry",
+          "stylers": [
+            {
+              "visibility": "off"
+            }
+          ]
+        },
+        {
+          "featureType": "administrative.land_parcel",
+          "elementType": "labels",
+          "stylers": [
+            {
+              "visibility": "off"
+            }
+          ]
+        },
+        {
+          "featureType": "administrative.locality",
+          "stylers": [
+            {
+              "weight": 3.5
+            }
+          ]
+        },
+        {
+          "featureType": "administrative.locality",
+          "elementType": "labels.text.fill",
+          "stylers": [
+            {
+              "color": "#1aa195"
+            },
+            {
+              "lightness": -40
+            }
+          ]
+        },
+        {
+          "featureType": "administrative.locality",
+          "elementType": "labels.text.stroke",
+          "stylers": [
+            {
+              "weight": 5
+            }
+          ]
+        },
+        {
+          "featureType": "landscape.man_made",
+          "elementType": "geometry.fill",
+          "stylers": [
+            {
+              "color": "#e3e7ea"
+            }
+          ]
+        },
+        {
+          "featureType": "landscape.man_made",
+          "elementType": "geometry.stroke",
+          "stylers": [
+            {
+              "visibility": "off"
+            }
+          ]
+        },
+        {
+          "featureType": "landscape.natural",
+          "stylers": [
+            {
+              "saturation": -25
+            }
+          ]
+        },
+        {
+          "featureType": "landscape.natural",
+          "elementType": "geometry.fill",
+          "stylers": [
+            {
+              "color": "#e1ece1"
+            }
+          ]
+        },
+        {
+          "featureType": "landscape.natural.landcover",
+          "elementType": "geometry.fill",
+          "stylers": [
+            {
+              "visibility": "on"
+            }
+          ]
+        },
+        {
+          "featureType": "landscape.natural.terrain",
+          "elementType": "geometry.fill",
+          "stylers": [
+            {
+              "color": "#9cdcfe"
+            },
+            {
+              "visibility": "on"
+            }
+          ]
+        },
+        {
+          "featureType": "poi",
+          "stylers": [
+            {
+              "visibility": "off"
+            }
+          ]
+        },
+        {
+          "featureType": "road",
+          "elementType": "labels.icon",
+          "stylers": [
+            {
+              "visibility": "off"
+            }
+          ]
+        },
+        {
+          "featureType": "road.arterial",
+          "elementType": "labels.text.fill",
+          "stylers": [
+            {
+              "color": "#617876"
+            }
+          ]
+        },
+        {
+          "featureType": "road.arterial",
+          "elementType": "labels.text.stroke",
+          "stylers": [
+            {
+              "color": "#ffffff"
+            }
+          ]
+        },
+        {
+          "featureType": "road.highway",
+          "elementType": "geometry.fill",
+          "stylers": [
+            {
+              "color": "#fbfcda"
+            }
+          ]
+        },
+        {
+          "featureType": "road.highway",
+          "elementType": "geometry.stroke",
+          "stylers": [
+            {
+              "color": "#f5daa0"
+            }
+          ]
+        },
+        {
+          "featureType": "road.highway",
+          "elementType": "labels",
+          "stylers": [
+            {
+              "saturation": 25
+            }
+          ]
+        },
+        {
+          "featureType": "road.highway",
+          "elementType": "labels.icon",
+          "stylers": [
+            {
+              "saturation": -100
+            },
+            {
+              "visibility": "simplified"
+            }
+          ]
+        },
+        {
+          "featureType": "road.highway",
+          "elementType": "labels.text.fill",
+          "stylers": [
+            {
+              "saturation": -100
+            },
+            {
+              "visibility": "simplified"
+            },
+            {
+              "weight": 3
+            }
+          ]
+        },
+        {
+          "featureType": "road.local",
+          "elementType": "geometry",
+          "stylers": [
+            {
+              "visibility": "simplified"
+            }
+          ]
+        },
+        {
+          "featureType": "road.local",
+          "elementType": "geometry.fill",
+          "stylers": [
+            {
+              "color": "#f3f5f5"
+            },
+            {
+              "visibility": "simplified"
+            }
+          ]
+        },
+        {
+          "featureType": "road.local",
+          "elementType": "labels",
+          "stylers": [
+            {
+              "visibility": "off"
+            }
+          ]
+        },
+        {
+          "featureType": "road.local",
+          "elementType": "labels.text",
+          "stylers": [
+            {
+              "color": "#99afb5"
+            },
+            {
+              "visibility": "simplified"
+            }
+          ]
+        },
+        {
+          "featureType": "road.local",
+          "elementType": "labels.text.fill",
+          "stylers": [
+            {
+              "color": "#799391"
+            }
+          ]
+        },
+        {
+          "featureType": "road.local",
+          "elementType": "labels.text.stroke",
+          "stylers": [
+            {
+              "color": "#75918e"
+            }
+          ]
+        },
+        {
+          "featureType": "transit",
+          "stylers": [
+            {
+              "visibility": "off"
+            }
+          ]
+        },
+        {
+          "featureType": "water",
+          "elementType": "geometry.fill",
+          "stylers": [
+            {
+              "color": "#9cdcfe"
+            }
+          ]
+        }
+      ]
+      // Objeto que receberá o mapa na coordenada especifica no atributo center.
+      map = new google.maps.Map(document.getElementById('map'), {
+        center: { lat: -3.7943731426509637, lng: -38.4524917602 },
+        zoom: 12,
+        styles: styles,
+        mapTypeControl: false
+      });
+      // Array que receberá as posições para compor os marcadores
+      var locations = [{ title: 'AUGUSTO', location: { lat: -3.800609, lng: -38.569449 } },
+      { title: 'TOCA DO FRANGO', location: { lat: -3.798177, lng: -38.577365 } },
+      { title: 'FANOR', location: { lat: -3.749484, lng: -38.462489 } },
+      { title: 'UNIFOR', location: { lat: -3.744798, lng: -38.572782 } }
+      ];
+      var largeInfoWindow = new google.maps.InfoWindow();
+      var drawingManager = new google.maps.drawing.DrawingManager({
+        drawingMode: google.maps.drawing.OverlayType.POLYGON,
+        drawingControl: true,
+        drawingControlOptions: {
+          position: google.maps.ControlPosition.TOP_LEFT,
+          drawingModes: [
+            google.maps.drawing.OverlayType.POLYGON
+          ]
+        }
+      });
+      //Define as propriedades do icone
+      var defaultIcon = makeMarkerIcon('0091ff');
+      var highlightedIcon = makeMarkerIcon('FFFF24');
+      for (var i = 0; i < locations.length; i++) {
+        var position = locations[i].location;
+        var title = locations[i].title;
+        var marker = new google.maps.Marker({
+          position: position,
+          title: title,
+          icon: defaultIcon,
+          animation: google.maps.Animation.DROP,
+          id: i
+        });
+        markers.push(marker);
+        marker.addListener('click', function () {
+          populateInfoWindow(this, largeInfoWindow);
+        });
+        marker.addListener('mouseover', function () {
+          this.setIcon(highlightedIcon);
+        });
+        marker.addListener('mouseout', function () {
+          this.setIcon(defaultIcon);
+        });
+      }
+      document.getElementById('show-listings').addEventListener('click', showListings);
+      document.getElementById('hide-listings').addEventListener('click', hideListings);
+      document.getElementById('toggle-drawing').addEventListener('click', function () {
+        toggleDrawing(drawingManager);
+      });
+      drawingManager.addListener('overlaycomplete', function (event) {
+        if (polygon) {
+          polygon.setMap(null);
+          hideListings();
+        }
+        drawingManager.setDrawingMode(null);
+        polygon = event.overlay;
+        polygon.setEditable(true);
+        searchWithinPolygon();
+        polygon.getPath().addListener('set_at', searchWithinPolygon);
+        polygon.getPath().addListener('insert_at', searchWithinPolygon);
+      });
+      map.fitBounds(bounds);
+    }
+    function populateInfoWindow(marker, infowindow) {
+      if (infowindow.marker != marker) {
+        infowindow.marker = marker;
+        infowindow.setContent('');
+        infowindow.open(map, marker);
+        infowindow.addListener('closeclick', function () {
+          infowindow.setMarker(null);
+        });
+        var streetViewService = new google.maps.StreetViewService();
+        var radius = 50;
+        function getStreetView(data, status) {
+          if (status == google.maps.StreetViewStatus.OK) {
+            var nearStreetViewLocation = data.location.latLng;
+            var heading = google.maps.geometry.spherical.computeHeading(
+              nearStreetViewLocation, marker.position);
+            infowindow.setContent('<div>' + marker.title + '</div>' + '<div id="pano"></div>');
+            var panoramaOptions = {
+              position: nearStreetViewLocation,
+              pov: {
+                heading: heading,
+                pitch: 30
+              }
+            };
+            var panorama = new google.maps.StreetViewPanorama(
+              document.getElementById('pano'), panoramaOptions);
+          } else {
+            infowindow.setContent('<div>' + marker.title + '</div>' + '<div>No Street View Found</div>');
+          }
+        }
+        streetViewService.getPanoramaByLocation(marker.position, radius, getStreetView);
+        infowindow.open(map, marker);
+      }
+    }
+    function showListings() {
+      var bounds = new google.maps.LatLngBounds();
+      for (var i = 0; i < markers.length; i++) {
+        markers[i].setMap(map);
+        bounds.extend(markers[i].position);
+      }
+    }
+    function hideListings() {
+      for (var i = 0; i < markers.length; i++) {
+        markers[i].setMap(null);
+      }
+    }
+    function makeMarkerIcon(markerColor) {
+      var markerImage = new google.maps.MarkerImage(
+        'http://chart.googleapis.com/chart?chst=d_map_spin&chld=1.15|0|' + markerColor +
+        '|40|_|%E2%80%A2',
+        new google.maps.Size(21, 34),
+        new google.maps.Point(0, 0),
+        new google.maps.Point(10, 34),
+        new google.maps.Size(21, 34));
+      return markerImage;
+    }
+    function toggleDrawing(drawingManager) {
+      if (drawingManager.map) {
+        drawingManager.setMap(null);
+        if (polygon) {
+          polygon.setMap(null);
+        }
+      } else {
+        drawingManager.setMap(map);
+      }
+    }
+    function searchWithinPolygon() {
+      for (var i = 0; i < markers.length; i++) {
+        if (google.maps.geometry.poly.containsLocation(markers[i].position, polygon)) {
+          markers[i].setMap(map);
+        } else {
+          markers[i].setMap(null);
+        }
+      }
+    }
+  </script>
+
+  <script async defer src="https://maps.googleapis.com/maps/api/js?libraries=drawing,geometry&key=AIzaSyCtU2Job9s16ReKHFqKAK_uM70CueOgqqI&V=3&callback=initMap"> </script>
+
+</body>
+
+</html>
